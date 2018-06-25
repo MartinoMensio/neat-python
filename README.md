@@ -1,5 +1,10 @@
 # DeepNEAT
 
+# Requirements
+
+system: libsm6 python3-tk
+python: see `requirements.txt`
+
 # NEAT
 
 from [https://github.com/CodeReclaimers/neat-python](https://github.com/CodeReclaimers/neat-python)

@@ -86,7 +86,8 @@ class DefaultNodeGene(BaseGene):
                         StringAttribute('kernel_size_conv', options='1 3 5 7'),
                         StringAttribute('stride_conv', options='1 2'),
                         StringAttribute('stride_pool', options='1 2'),
-                        StringAttribute('poolsize_pool', options='2 3')]
+                        StringAttribute('poolsize_pool', options='2 3'),
+                        StringAttribute('has_maxpool', options='true false')]
 
     def __init__(self, key):
         assert isinstance(key, int), "DefaultNodeGene key must be an int, not {!r}".format(key)
