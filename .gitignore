@@ -1,3 +1,6 @@
+datasets/*
+!datasets/README.md
+
 .coveralls.yml
 docs/_build/**
 _build/**

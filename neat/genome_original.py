@@ -134,7 +134,6 @@ class DefaultGenome(object):
         # Fitness results.
         self.fitness = None
         self.accuracy = None
-        self.test_accuracy = None
 
         # Number of layes
         self.layers = 0
@@ -252,8 +251,8 @@ class DefaultGenome(object):
 
         # Compute node gene distance component.
         node_distance = 0.0
-        if len(self.nodes)!=len(other.nodes):
-            node_distance=50
+        if len(self.nodes)!=len(self.nodes):
+            node_distance=1000
         else:
             if self.nodes or other.nodes:
                 disjoint_nodes = 0
@@ -295,7 +294,7 @@ class DefaultGenome(object):
         return size
 
     def __str__(self):
-        s = "Key: {0}\nFitness: {1}\nValidation Accuracy: {2}\nTest Accuracy: {3}\nNodes:".format(self.key, self.fitness, self.accuracy, self.test_accuracy)
+        s = "Key: {0}\nFitness: {1}\nAccuracy: {2}\nNodes:".format(self.key, self.fitness, self.accuracy)
         for k, ng in iteritems(self.nodes):
             s += "\n\t{0} {1!s}".format(k, ng)
 

@@ -82,11 +82,12 @@ class DefaultNodeGene(BaseGene):
     _gene_attributes = [StringAttribute('type_of_layer', options='conv2d dense'),
                         StringAttribute('num_of_nodes', options='512 1024 2048'),
                         StringAttribute('activation', options='relu sigmoid'),
-                        StringAttribute('num_filters_conv', options='8 16 32 64'),
+                        StringAttribute('num_filters_conv', options='32 64 96'),
                         StringAttribute('kernel_size_conv', options='1 3 5 7'),
                         StringAttribute('stride_conv', options='1 2'),
                         StringAttribute('stride_pool', options='1 2'),
-                        StringAttribute('poolsize_pool', options='2 3')]
+                        StringAttribute('poolsize_pool', options='2 3'),
+                        StringAttribute('has_maxpool', options='true false')]
 
     def __init__(self, key):
         assert isinstance(key, int), "DefaultNodeGene key must be an int, not {!r}".format(key)
@@ -122,16 +123,18 @@ class DefaultNodeGene(BaseGene):
                 if self.stride_conv != other.stride_conv:
                     d+=factors["stride_conv"]
 
-                if self.stride_pool != other.stride_pool:
-                    d+=factors["stride_pool"]
+                if (self.has_maxpool == "true" or other.has_maxpool == "true"):
+                    if self.stride_pool != other.stride_pool:
+                        d+=factors["stride_pool"]
 
-                if self.stride_pool != other.stride_pool:
-                    d+=factors["stride_pool"]
+                    if self.stride_pool != other.stride_pool:
+                        d+=factors["stride_pool"]
         
         if self.activation != other.activation:
             d+=factors["activation"]
 
         
+
         return d * config.compatibility_weight_coefficient
 
 
