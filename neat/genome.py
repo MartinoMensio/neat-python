@@ -200,7 +200,7 @@ class DefaultGenome(object):
                         "Warning: initial_connection = fs_neat will not connect to hidden nodes;",
                         "\tif this is desired, set initial_connection = fs_neat_nohidden;",
                         "\tif not, set initial_connection = fs_neat_hidden",
-                        sep='\n', file=sys.stderr);
+                        sep='\n', file=sys.stderr)
                 self.connect_fs_neat_nohidden(config)
         elif 'full' in config.initial_connection:
             if config.initial_connection == 'full_nodirect':

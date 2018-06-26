@@ -1,3 +1,11 @@
+datasets/*
+!datasets/README.md
+venv/*
+*.egg-info/
+build/
+dist/
+split/
+
 .coveralls.yml
 docs/_build/**
 _build/**

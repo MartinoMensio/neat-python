@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 """Directed graph algorithm implementations."""
 
 def creates_cycle(connections, test):
@@ -89,4 +91,12 @@ def feed_forward_layers(inputs, outputs, connections):
 
     return layers
 
-
+def is_connected(inputs, outputs, connections):
+    """Checks if all the inputs and outputs are connected in the network"""
+    down = defaultdict(lambda: set())
+    up = defaultdict(lambda: set())
+    for a, b in connections:
+        down[a].add(b)
+        up[b].add(a)
+    #for
+    # TODO do something for checking that the graph seems good
