@@ -1,3 +1,4 @@
+import os
 import tensorflow as tf
 
 # if need to add dropout layer
@@ -5,12 +6,13 @@ import tensorflow as tf
 # dropout = tf.layers.dropout(
 #   inputs=dense, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
 
-tf.logging.set_verbosity(tf.logging.INFO)
+tf.logging.set_verbosity(tf.logging.WARN)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
 NUMBER_OF_CLASSES=10
 NUM_CHANNEL = 3
 INPUT_DIM=32
-EPOCHS=18
+EPOCHS=2
 
 def create_input_layer(features):
 	return tf.reshape(features, [-1, INPUT_DIM, INPUT_DIM, NUM_CHANNEL])
@@ -284,7 +286,7 @@ def create_net_and_train(genome, train_feat, train_class, val_feat, val_class, t
 
 	my_classifier.train(
 		input_fn=train_input_fn,
-		steps=None,
+		steps=10,
 		hooks=[logging_hook])
 
 	

@@ -25,7 +25,7 @@ DATA_ROOT_DIR_TEST="DevanagariHandwrittenCharacterDataset/Test"
 MAX_FITNESS=-10
 MAX_VAL_ACCURACY=-1
 MAX_TEST_ACCURACY=-1
-NUM_OF_GENERATIONS=7
+NUM_OF_GENERATIONS=2
 
 
 NP_SAVE_PATH="split/train_feat.npy"
@@ -73,6 +73,7 @@ def eval_genome(genome, config):
 
 
 def eval_genomes(genomes, config):
+    print('evaluating {} genomes'.format(len(genomes)))
     
     for genome_id, genome in genomes:
         # if len(genome.sequence)==1:
