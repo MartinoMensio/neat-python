@@ -4,3 +4,5 @@ opencv-python # remember to install libsm6
 graphviz
 matplotlib
 # install python-tk
+graphviz
+pydot
