@@ -109,9 +109,13 @@ class DefaultGenomeConfig(object):
 
     def get_new_node_key(self, node_dict):
         if self.node_indexer is None:
-            self.node_indexer = count(max(list(iterkeys(node_dict))) + 1)
+            self.node_indexer = 0
+            #self.node_indexer = count(max(list(iterkeys(node_dict)), default=0) + 1)
 
-        new_id = next(self.node_indexer)
+        # TODO broken stuff, id is assigned by caller
+        #new_id = next(self.node_indexer)
+        self.node_indexer += 1
+        new_id = self.node_indexer
 
         assert new_id not in node_dict
 
@@ -468,6 +472,7 @@ class DefaultGenome(object):
     def create_node(config, node_id):
         node = config.node_gene_type(node_id)
         node.init_attributes(config)
+        node.type = node_id.split('.')[0]
         return node
 
     @staticmethod

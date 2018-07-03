@@ -83,7 +83,7 @@ class DefaultNodeGene(BaseGene):
                         StringAttribute('aggregation', options='sum')]
 
     def __init__(self, key):
-        assert isinstance(key, int), "DefaultNodeGene key must be an int, not {!r}".format(key)
+        #assert isinstance(key, int), "DefaultNodeGene key must be an int, not {!r}".format(key)
         BaseGene.__init__(self, key)
 
     def distance(self, other, config):

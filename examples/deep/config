@@ -9,21 +9,25 @@ elitism            = 2
 survival_threshold = 0.2
 
 [DefaultGenome_deep]
-num_inputs = 1
-num_outputs = 2
+#num_inputs = 1
+#num_outputs = 2
 num_hidden = 10
 feed_forward = True
 compatibility_disjoint_coefficient = 1
 compatibility_weight_coefficient = 1
-conn_add_prob = 0.2
-conn_delete_prob = 0.3
-node_add_prob = 0.99
-node_delete_prob = 0.3
+conn_add_prob = 0.0
+conn_delete_prob = 0.0
+node_add_prob = 1.0
+node_delete_prob = 0.0
 type_of_layer_mutate_rate = 0.2
 activation_mutate_rate = 0.2
 hidden_size_mutate_rate = 0.2
 enabled_default = True
 enabled_mutate_rate = 0.2
+initial_connection = predefined
+templates = (in,embeddings),(embeddings,encoder),(encoder:seq,yang_att),(yang_att,dense),(dense,out.intent),(encoder:seq,decoder.bd),(decoder.bd,out.bd),(decoder.bd,decoder.ac),(decoder.ac,out.ac)
+    (in,embeddings),(embeddings,encoder),(encoder:seq,yang_att),(yang_att,dense),(dense,out.intent),(encoder:seq,decoder.bd),(decoder.bd,out.bd),(encoder:seq,concat),(decoder.bd,concat),(concat,decoder.ac),(decoder.ac,out.ac)
+    (in,embeddings),(embeddings,encoder),(encoder:single,dense),(dense,out.intent),(encoder:seq,decoder.bd),(decoder.bd,out.bd),(encoder:seq,concat),(decoder.bd,concat),(concat,decoder.ac),(decoder.ac,out.ac)
 #initial_connection = full
 
 [DefaultSpeciesSet]

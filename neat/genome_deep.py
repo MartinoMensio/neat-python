@@ -8,9 +8,11 @@ from neat.aggregations import AggregationFunctionSet
 from neat.config import ConfigParameter, write_pretty_params
 from neat.genes_deep import DefaultConnectionGene_deep, DefaultNodeGene_deep
 from neat.graphs import creates_cycle
+from neat.six_util import iteritems, iterkeys
+import neat.templates as templates
 
 class DefaultGenomeConfig_deep(genome.DefaultGenomeConfig):
-    allowed_connectivity = ['unconnected', 'full_nodirect', 'full', 'full_direct'] # TODO check these values
+    allowed_connectivity = ['unconnected', 'full_nodirect', 'full', 'full_direct', 'predefined'] # TODO check these values
 
     def __init__(self, params):
         # Create full set of available activation functions.
@@ -19,9 +21,9 @@ class DefaultGenomeConfig_deep(genome.DefaultGenomeConfig):
         self.aggregation_function_defs = AggregationFunctionSet()
         self.aggregation_defs = self.aggregation_function_defs
 
-        self._params = [ConfigParameter('num_inputs', int),
-                        ConfigParameter('num_outputs', int),
-                        ConfigParameter('num_hidden', int),
+        self._params = [# ConfigParameter('num_inputs', int), the inputs is always only one: the words
+                        # ConfigParameter('num_outputs', int), the outputs are always three: AD, AI, AC
+                        # ConfigParameter('num_hidden', int), # not required in predefined initial_connection, because the number of hidden units may change, defined in the templates
                         ConfigParameter('feed_forward', bool),
                         ConfigParameter('compatibility_disjoint_coefficient', float),
                         ConfigParameter('compatibility_weight_coefficient', float),
@@ -31,10 +33,13 @@ class DefaultGenomeConfig_deep(genome.DefaultGenomeConfig):
                         ConfigParameter('node_delete_prob', float),
                         ConfigParameter('single_structural_mutation', bool, False),
                         ConfigParameter('structural_mutation_surer', str, 'default'),
-                        ConfigParameter('initial_connection', str, 'unconnected')]
+                        ConfigParameter('initial_connection', str, 'unconnected'),
+                        ConfigParameter('templates', str)]
 
         # Gather configuration data from the gene classes.
         self.node_gene_type = params['node_gene_type']
+        print(self.node_gene_type.__dict__)
+        #exit(1)
         self._params += self.node_gene_type.get_config_params()
         self.connection_gene_type = params['connection_gene_type']
         self._params += self.connection_gene_type.get_config_params()
@@ -45,8 +50,9 @@ class DefaultGenomeConfig_deep(genome.DefaultGenomeConfig):
 
         # By convention, input pins have negative keys, and the output
         # pins have keys 0,1,...
-        self.input_keys = [-i - 1 for i in range(self.num_inputs)]
-        self.output_keys = [i for i in range(self.num_outputs)]
+        self.input_keys = ['in']
+        self.output_keys = set()
+        # self.output_keys = ['out.intent', 'out.boundaries', 'out.arguments'] # read from config
 
         # Verify that initial connection type is valid.
 
@@ -81,16 +87,44 @@ class DefaultGenome_deep(genome.DefaultGenome):
     def parse_config(cls, param_dict):
         param_dict['node_gene_type'] = DefaultNodeGene_deep
         param_dict['connection_gene_type'] = DefaultConnectionGene_deep
+        #param_dict['templates'] = param_dict['templates'].split()
+        print(param_dict)
+        print('HELLO')
+        #exit(1)
         return DefaultGenomeConfig_deep(param_dict)
 
-    def configure_new(self, config):
+    def configure_new(self, config, genome_key):
         # deep note: removed partial and other connections
-        """Configure a new genome based on the given configuration."""
+        """Configure a new genome based on the given configuration. The parameter `genome_key` identifies the genome"""
+
+        available_templates = config.templates.split()
+        print(available_templates)
+        print(len(available_templates))
+        #exit(1)
+        # choose a template
+        template_chosen_idx = genome_key % len(available_templates)
+        template_to_build = available_templates[template_chosen_idx]
+        print(template_to_build)
+        nodes, connections = templates.parse(template_to_build, 'chosen.png')
+        print(nodes, connections)
+        for node in nodes:
+            self.nodes[node] = self.create_node(config, node)
+            if 'out' in node:
+                config.output_keys.add(node)
+        for connection in connections:
+            self.add_connection(config, connection.src.get_block_id(), connection.dst.get_block_id(), True)
 
         # Create node genes for the output pins.
-        for node_key in config.output_keys:
-            self.nodes[node_key] = self.create_node(config, node_key)
-
+        # for node_key in config.output_keys:
+        #    self.nodes[node_key] = self.create_node(config, node_key)
+        #self.output_keys = ['_'.join(k.split('_')[1:]) for k, v in config.items() if 'template' in k]
+        #node_key = config.get_new_node_key(self.nodes)
+        #assert node_key not in self.nodes
+        # TODO create a node of type output
+        #node = self.create_node(config, node_key)
+        #self.nodes[node_key] = node
+        # TODO parse template and get edges and nodes
+        """
         # Add hidden nodes if requested.
         if config.num_hidden > 0:
             for i in range(config.num_hidden):
@@ -98,6 +132,7 @@ class DefaultGenome_deep(genome.DefaultGenome):
                 assert node_key not in self.nodes
                 node = self.create_node(config, node_key)
                 self.nodes[node_key] = node
+        """
 
         # Add connections based on initial connectivity type.
     
@@ -109,12 +144,14 @@ class DefaultGenome_deep(genome.DefaultGenome):
             elif config.initial_connection == 'full_direct':
                 self.connect_full_direct(config)
             else:
+                """
                 if config.num_hidden > 0:
                     print(
                         "Warning: initial_connection = full with hidden nodes will not do direct input-output connections;",
                         "\tif this is desired, set initial_connection = full_nodirect;",
                         "\tif not, set initial_connection = full_direct",
                         sep='\n', file=sys.stderr)
+                """
                 self.connect_full_nodirect(config)
     
     def mutate_add_node(self, config):
@@ -126,7 +163,7 @@ class DefaultGenome_deep(genome.DefaultGenome):
 
         # Choose a random connection to split
         conn_to_split = choice(list(self.connections.values()))
-        new_node_id = config.get_new_node_key(self.nodes)
+        new_node_id = 'you_must_assign_me.{}'.format(config.get_new_node_key(self.nodes))
         ng = self.create_node(config, new_node_id)
         self.nodes[new_node_id] = ng
 
@@ -139,12 +176,32 @@ class DefaultGenome_deep(genome.DefaultGenome):
         self.add_connection(config, i, new_node_id, True)
         self.add_connection(config, new_node_id, o, True)
 
+    def mutate_delete_node(self, config):
+        # Do nothing if there are no non-output nodes.
+        available_nodes = [k for k in iterkeys(self.nodes) if k not in config.output_keys]
+        if not available_nodes:
+            return -1
+
+        del_key = choice(available_nodes)
+
+        connections_to_delete = set()
+        for k, v in iteritems(self.connections):
+            if del_key in v.key:
+                connections_to_delete.add(v.key)
+
+        for key in connections_to_delete:
+            del self.connections[key]
+
+        del self.nodes[del_key]
+
+        return del_key
+
     def add_connection(self, config, input_key, output_key, enabled):
         # deep note: removed weight
-        # TODO: Add further validation of this connection addition?
-        assert isinstance(input_key, int)
-        assert isinstance(output_key, int)
-        assert output_key >= 0
+        # TODO: Add further validation of this connection addition? Like check that input and outputs can be connected, in shape or similar
+        #assert isinstance(input_key, int)
+        #assert isinstance(output_key, int)
+        #assert output_key >= 0
         assert isinstance(enabled, bool)
         key = (input_key, output_key)
         connection = config.connection_gene_type(key)

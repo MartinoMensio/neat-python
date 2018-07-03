@@ -56,10 +56,12 @@ class DefaultReproduction(DefaultClassConfig):
 
     def create_new(self, genome_type, genome_config, num_genomes):
         new_genomes = {}
+        print('create_new in reproduction.py', num_genomes)
         for i in range(num_genomes):
             key = next(self.genome_indexer)
             g = genome_type(key)
-            g.configure_new(genome_config)
+            print('creating new genome', g)
+            g.configure_new(genome_config, key)
             new_genomes[key] = g
             self.ancestors[key] = tuple()
 

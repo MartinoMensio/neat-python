@@ -15,7 +15,7 @@ def draw_net(config, genome, view=False, filename=None, node_names=None, show_di
         return
 
     if node_names is None:
-        node_names = {k: '{}-{}'.format(k, v.type_of_layer) for (k, v) in genome.nodes.items()}
+        node_names = {k: k for (k, v) in genome.nodes.items()}
 
     assert type(node_names) is dict
 
