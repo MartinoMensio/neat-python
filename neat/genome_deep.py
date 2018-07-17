@@ -50,7 +50,7 @@ class DefaultGenomeConfig_deep(genome.DefaultGenomeConfig):
 
         # By convention, input pins have negative keys, and the output
         # pins have keys 0,1,...
-        self.input_keys = ['in']
+        self.input_keys = ['embeddings']
         self.output_keys = set()
         # self.output_keys = ['out.intent', 'out.boundaries', 'out.arguments'] # read from config
 
@@ -105,11 +105,12 @@ class DefaultGenome_deep(genome.DefaultGenome):
         template_chosen_idx = genome_key % len(available_templates)
         template_to_build = available_templates[template_chosen_idx]
         print(template_to_build)
-        nodes, connections = templates.parse(template_to_build, 'chosen.png')
+        nodes, connections = templates.parse(template_to_build, 'chosen')
         print(nodes, connections)
         for node in nodes:
             # set the type of node, predetermined by initial configurations
             config.type_of_layer_default = node.split('.')[0]
+            #node_key = config.get_new_node_key(self.nodes)
             self.nodes[node] = self.create_node(config, node)
             if 'out' in node:
                 config.output_keys.add(node)
@@ -167,8 +168,9 @@ class DefaultGenome_deep(genome.DefaultGenome):
 
         # Choose a random connection to split
         conn_to_split = choice(list(self.connections.values()))
-        #new_node_id = 'you_must_assign_me.{}'.format(config.get_new_node_key(self.nodes))
-        ng, new_node_id = self.create_node_b(config)
+        new_node_id = '{}.{}'.format(choice(config.type_of_layer_options) , config.get_new_node_key(self.nodes))
+        ng = self.create_node(config, new_node_id)
+        new_node_id = ng.key
         self.nodes[new_node_id] = ng
 
         # Disable this connection and create two new connections joining its nodes via
@@ -181,8 +183,9 @@ class DefaultGenome_deep(genome.DefaultGenome):
         self.add_connection(config, new_node_id, o, True)
 
     def mutate_delete_node(self, config):
+        # TODO don't remove connections that isolate things
         # Do nothing if there are no non-output nodes.
-        available_nodes = [k for k in iterkeys(self.nodes) if k not in config.output_keys]
+        available_nodes = [k for k in iterkeys(self.nodes) if k not in (set(config.output_keys) | set(config.input_keys))]
         if not available_nodes:
             return -1
 
@@ -211,6 +214,7 @@ class DefaultGenome_deep(genome.DefaultGenome):
         connection = config.connection_gene_type(key)
         connection.init_attributes(config)
         connection.enabled = enabled
+        #connection.in_port = 'fake'
         self.connections[key] = connection
 
     def mutate_add_connection(self, config):
@@ -221,11 +225,21 @@ class DefaultGenome_deep(genome.DefaultGenome):
         , the only restriction being that the output
         node cannot be one of the network input pins.
         """
-        possible_outputs = list(self.nodes.keys())
-        out_node = choice(possible_outputs)
+        possible_outputs = list(set(self.nodes.keys()) - set(config.input_keys))
+        possible_inputs = list(set(possible_outputs) - set(config.output_keys))
 
-        possible_inputs = possible_outputs + config.input_keys
-        in_node = choice(possible_inputs)
+        choices = []
+
+        for in_key in possible_inputs:
+            for out_key in possible_outputs:
+                src_node, dst_node = self.nodes[in_key], self.nodes[out_key]
+                #print('aaa', in_key, out_key)
+                for src_name, src_descr in src_node.description['outputs'].items():
+                    if any([dst_descr['len_shape'] == src_descr['len_shape'] for dst_descr in dst_node.description['inputs'].values()]):
+                        choices.append((in_key, src_name, out_key)) # TODO identify the selected port: + ':' + src_name
+
+        in_node, in_port, out_node = choice(choices)
+        print(in_node, in_port, out_node)
 
         # Don't duplicate connections.
         key = (in_node, out_node)
@@ -247,6 +261,7 @@ class DefaultGenome_deep(genome.DefaultGenome):
             return
 
         cg = self.create_connection(config, in_node, out_node)
+        cg.in_port = in_port
         self.connections[cg.key] = cg
 
     
@@ -254,12 +269,12 @@ class DefaultGenome_deep(genome.DefaultGenome):
         node_id = 'tmp'
         node = config.node_gene_type(node_id)
         node.init_attributes(config)
-        print(node)
+        #print(node)
         #node.type = node_id.split('.')[0]
         key = config.get_new_node_key(self.nodes)
         full_node_key = '{}.{}'.format(node.type_of_layer, key)
         node.key = full_node_key
-        print(node)
-        print(node.key)
+        #print(node)
+        #print(node.key)
         #exit(1)
         return node, full_node_key

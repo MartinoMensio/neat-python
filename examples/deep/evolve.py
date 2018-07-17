@@ -13,7 +13,7 @@ def eval_genomes(genomes, config):
         for (id, g) in genomes:
             #print(id)
             #print(id, g.nodes, g.connections)
-            print('genome')
+            #print('genome')
             for node_name, value in g.nodes.items() :
                 #print(node_name, value.type_of_layer)
                 pass

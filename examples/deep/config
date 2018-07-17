@@ -25,9 +25,9 @@ hidden_size_mutate_rate = 0.2
 enabled_default = True
 enabled_mutate_rate = 0.2
 initial_connection = predefined
-templates = (in,embeddings),(embeddings,encoder),(encoder:seq,yang_att),(yang_att,dense),(dense,out.intent),(encoder:seq,decoder.bd),(decoder.bd,out.bd),(decoder.bd,decoder.ac),(decoder.ac,out.ac)
-    (in,embeddings),(embeddings,encoder),(encoder:seq,yang_att),(yang_att,dense),(dense,out.intent),(encoder:seq,decoder.bd),(decoder.bd,out.bd),(encoder:seq,concat),(decoder.bd,concat),(concat,decoder.ac),(decoder.ac,out.ac)
-    (in,embeddings),(embeddings,encoder),(encoder:single,dense),(dense,out.intent),(encoder:seq,decoder.bd),(decoder.bd,out.bd),(encoder:seq,concat),(decoder.bd,concat),(concat,decoder.ac),(decoder.ac,out.ac)
+templates = (embeddings,rnn_bidir),(rnn_bidir:seq,yang_att),(yang_att,dense),(dense,out_single.intent),(rnn_bidir:seq,decoder.bd),(decoder.bd,out_seq.bd),(decoder.bd,decoder.ac),(decoder.ac,out_seq.ac)
+    (embeddings,rnn_bidir),(rnn_bidir:seq,yang_att),(yang_att,dense),(dense,out_single.intent),(rnn_bidir:seq,decoder.bd),(decoder.bd,out_seq.bd),(rnn_bidir:seq,decoder.ac),(decoder.bd,decoder.ac),(decoder.ac,out_seq.ac)
+    (embeddings,rnn_bidir),(rnn_bidir:single,dense),(dense,out_single.intent),(rnn_bidir:seq,decoder.bd),(decoder.bd,out_seq.bd),(rnn_bidir:seq,decoder.ac),(decoder.bd,decoder.ac),(decoder.ac,out_seq.ac)
 #initial_connection = full
 
 [DefaultSpeciesSet]
