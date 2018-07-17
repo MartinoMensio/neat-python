@@ -11,10 +11,16 @@ def eval_genomes(genomes, config):
         # TODO this is just an experiment, there you should create the network and evaluate it
         genome.fitness = (len([g for g in genome.connections.values() if g.enabled])) * 1.0
         for (id, g) in genomes:
-            pass
             #print(id)
             #print(id, g.nodes, g.connections)
-
+            print('genome')
+            for node_name, value in g.nodes.items() :
+                #print(node_name, value.type_of_layer)
+                pass
+            for (src, dst), value in g.connections.items():
+                #print('{}->{}:{}'.format(src, dst, value.enabled))
+                pass
+        #exit(1)
         #net = neat.nn.FeedForwardNetwork.create(genome, config)
         #for xi, xo in zip(xor_inputs, xor_outputs):
         #    output = net.activate(xi)

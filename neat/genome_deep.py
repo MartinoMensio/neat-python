@@ -108,9 +108,13 @@ class DefaultGenome_deep(genome.DefaultGenome):
         nodes, connections = templates.parse(template_to_build, 'chosen.png')
         print(nodes, connections)
         for node in nodes:
+            # set the type of node, predetermined by initial configurations
+            config.type_of_layer_default = node.split('.')[0]
             self.nodes[node] = self.create_node(config, node)
             if 'out' in node:
                 config.output_keys.add(node)
+        # now restore the random node type choice for next nodes
+        config.type_of_layer_default = 'random'
         for connection in connections:
             self.add_connection(config, connection.src.get_block_id(), connection.dst.get_block_id(), True)
 
@@ -163,8 +167,8 @@ class DefaultGenome_deep(genome.DefaultGenome):
 
         # Choose a random connection to split
         conn_to_split = choice(list(self.connections.values()))
-        new_node_id = 'you_must_assign_me.{}'.format(config.get_new_node_key(self.nodes))
-        ng = self.create_node(config, new_node_id)
+        #new_node_id = 'you_must_assign_me.{}'.format(config.get_new_node_key(self.nodes))
+        ng, new_node_id = self.create_node_b(config)
         self.nodes[new_node_id] = ng
 
         # Disable this connection and create two new connections joining its nodes via
@@ -245,3 +249,17 @@ class DefaultGenome_deep(genome.DefaultGenome):
         cg = self.create_connection(config, in_node, out_node)
         self.connections[cg.key] = cg
 
+    
+    def create_node_b(self, config):
+        node_id = 'tmp'
+        node = config.node_gene_type(node_id)
+        node.init_attributes(config)
+        print(node)
+        #node.type = node_id.split('.')[0]
+        key = config.get_new_node_key(self.nodes)
+        full_node_key = '{}.{}'.format(node.type_of_layer, key)
+        node.key = full_node_key
+        print(node)
+        print(node.key)
+        #exit(1)
+        return node, full_node_key

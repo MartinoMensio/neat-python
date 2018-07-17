@@ -3,7 +3,7 @@ from neat import genes
 from neat.attributes import FloatAttribute, BoolAttribute, StringAttribute
 
 class DefaultNodeGene_deep(genes.DefaultNodeGene):
-    _gene_attributes = [StringAttribute('type_of_layer', options='dense recurrent decoder attention'),
+    _gene_attributes = [StringAttribute('type_of_layer', options='dense rnn_monodir rnn_bidir decoder decoder_att yang_att concat out in embeddings'),
                         #StringAttribute('num_of_nodes', options='512 1024 2048'), # maybe later
                         #StringAttribute('activation', options='relu sigmoid'),
                         #StringAttribute('num_filters_conv', options='8 16 32 64'),
