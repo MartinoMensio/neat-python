@@ -1,5 +1,8 @@
 from setuptools import setup
 
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
+
 setup(
     name='neat-python',
     version='0.92',
@@ -13,6 +16,7 @@ setup(
     long_description='Python implementation of NEAT (NeuroEvolution of Augmenting Topologies), a method ' +
                      'developed by Kenneth O. Stanley for evolving arbitrary neural networks.',
     packages=['neat', 'neat/iznn', 'neat/nn', 'neat/ctrnn'],
+    install_requires=required,
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
